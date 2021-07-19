@@ -1,6 +1,10 @@
 import { Action, Module, Mutation, VuexModule } from 'vuex-module-decorators'
 import { get } from '~/services/request'
 
+function validate(_wheelStore: string): boolean {
+  return true
+}
+
 @Module({ name: 'vehicle', stateFactory: true, namespaced: true })
 export default class VehicleModule extends VuexModule {
   wheels: number = 2
@@ -11,6 +15,7 @@ export default class VehicleModule extends VuexModule {
 
   @Mutation
   puncture(n: number): void {
+    console.log('puncture', { this: this })
     this.wheels = this.wheels - n
   }
 
@@ -21,7 +26,19 @@ export default class VehicleModule extends VuexModule {
 
   @Action({ rawError: true })
   async fetchNewWheels(wheelStore: string): Promise<void> {
+    console.log('fetchNewWheels', { this: this })
+    // other class members are not accessible
+    // if (!this.validate(wheelStore)) {
+    //   return
+    // }
+    if (!validate(wheelStore)) {
+      return
+    }
     const wheels = await get(wheelStore)
     this.addWheel(wheels)
+  }
+
+  validate(_wheelStore: string): boolean {
+    return true
   }
 }
